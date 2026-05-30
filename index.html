@@ -58,8 +58,9 @@
     .logo { display: block; text-decoration: none; }
     .wordmark { display: block; width: 130px; }
     .wordmark svg { width: 100%; height: auto; display: block; }
-    .hammer { flex: none; width: 42px; height: 42px; display: flex; align-items: center; }
-    .hammer svg { width: 100%; height: 100%; display: block; transform: rotate(20deg); }
+    /* hammer sits inline next to "build", sized to the word and tilted forward */
+    .hammer-inline { display: inline-block; width: 0.95em; height: 0.95em; vertical-align: -0.08em; margin: 0 0.12em; }
+    .hammer-inline svg { width: 100%; height: 100%; display: block; transform: rotate(48deg); }
 
     /* ---------- Hero ---------- */
     .hero { padding: 40px 0 20px; }
@@ -86,6 +87,13 @@
     }
     .hero .callout a { color: var(--blue-accent); text-decoration: none; border-bottom: 2px solid var(--navy-line); }
     .hero .callout a:hover { border-color: var(--blue-accent); }
+
+    /* every section fades up into view */
+    .fade-section { opacity: 0; transform: translateY(26px); transition: opacity 0.8s ease, transform 0.8s ease; }
+    .fade-section.visible { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .fade-section { opacity: 1; transform: none; transition: none; }
+    }
 
     section { padding: 48px 0; }
     .section-title {
@@ -303,25 +311,20 @@
           </svg>
         </span>
       </a>
-      <span class="hammer" aria-hidden="true">
-        <svg viewBox="0 0 16 16" fill="#3a6fc4">
-          <path d="M9.972 2.508a.5.5 0 0 0-.16-.556l-.178-.129a5 5 0 0 0-2.076-.783C6.215.862 4.504 1.229 2.84 3.133H1.786a.5.5 0 0 0-.354.147L.146 4.567a.5.5 0 0 0 0 .706l2.571 2.579a.5.5 0 0 0 .708 0l1.286-1.29a.5.5 0 0 0 .146-.353V5.57l8.387 8.873A.5.5 0 0 0 14 14.5l1.5-1.5a.5.5 0 0 0 .017-.689l-9.129-8.63c.747-.456 1.772-.839 3.112-.839a.5.5 0 0 0 .472-.334z"/>
-        </svg>
-      </span>
     </div>
   </header>
 
   <!-- ===== Hero ===== -->
   <div class="hero">
     <div class="wrap">
-      <p>We build <span class="accent">custom AI services</span> for the enterprising business —
+      <p>We build<span class="hammer-inline" aria-hidden="true"><svg viewBox="0 0 16 16" fill="#3a6fc4"><path d="M9.972 2.508a.5.5 0 0 0-.16-.556l-.178-.129a5 5 0 0 0-2.076-.783C6.215.862 4.504 1.229 2.84 3.133H1.786a.5.5 0 0 0-.354.147L.146 4.567a.5.5 0 0 0 0 .706l2.571 2.579a.5.5 0 0 0 .708 0l1.286-1.29a.5.5 0 0 0 .146-.353V5.57l8.387 8.873A.5.5 0 0 0 14 14.5l1.5-1.5a.5.5 0 0 0 .017-.689l-9.129-8.63c.747-.456 1.772-.839 3.112-.839a.5.5 0 0 0 .472-.334z"/></svg></span> <span class="accent">custom AI services</span> for the enterprising business —
          whether you need a virtual receptionist, data organization tools, or a multimedia asset.</p>
       <p class="callout">Call us at <a href="tel:+15617818103">+1 (561) 781-8103</a></p>
     </div>
   </div>
 
   <!-- ===== Contact ===== -->
-  <section id="contact">
+  <section id="contact" class="fade-section">
     <div class="wrap">
       <div class="card">
         <h2>Send us an email</h2>
@@ -343,7 +346,7 @@
   </section>
 
   <!-- ===== Live Demo ===== -->
-  <section id="demo">
+  <section id="demo" class="fade-section">
     <div class="wrap">
       <h2 class="section-title">Live Demo</h2>
       <div class="demo-grid">
@@ -445,7 +448,7 @@
   </section>
 
   <!-- ===== Media ===== -->
-  <section id="media">
+  <section id="media" class="fade-section">
     <div class="wrap">
       <h2 class="section-title">Media</h2>
       <div class="video-frame" id="videoFrame">
@@ -459,7 +462,7 @@
   </section>
 
   <!-- ===== Footer ===== -->
-  <footer>
+  <footer class="fade-section">
     <div class="wrap">
       Bilden Enterprises · Custom AI Services ·
       <a href="mailto:bildenenterprises@gmail.com">bildenenterprises@gmail.com</a>
@@ -468,7 +471,10 @@
   </footer>
 
   <!-- hidden audio: real recording when present, speech fallback otherwise -->
-  <audio id="callAudio" src="audio.mp3" preload="auto" playsinline></audio>
+  <audio id="callAudio" preload="auto" playsinline>
+    <source src="audio.m4a" type="audio/mp4" />
+    <source src="audio.mp3" type="audio/mpeg" />
+  </audio>
 
   <script>
     /* ---------- Contact form → email ---------- */
@@ -525,22 +531,23 @@
       }
 
       function playGreeting() {
-        // Try the real recording first; fall back to synthesized voice.
-        // Reset + play() must stay inside the tap handler so mobile browsers allow it.
-        try { callAudio.currentTime = 0; } catch (e) {}
+        // play() must be the first thing in the tap handler so mobile browsers allow it.
+        callAudio.muted = false;
         var p = callAudio.play();
-        if (p && p.catch) { p.catch(function () { speakFallback(); }); }
+        if (p && p.catch) {
+          p.catch(function () { speakFallback(); }); // only if the file truly can't play
+        }
       }
 
       function answer() {
         if (answered) return;
         answered = true;
+        playGreeting();                 // first, while we still hold the user gesture
         avatar.classList.remove('ringing');
         status.textContent = 'On call';
         tapHint.style.display = 'none';
         transcript.classList.add('show');
         transcriptText.textContent = LINE;
-        playGreeting();
         panel.classList.add('show');
       }
 
@@ -564,6 +571,22 @@
       } else {
         panel.classList.add('show');
       }
+    })();
+
+    /* ---------- Every section fades in on scroll ---------- */
+    (function () {
+      var sections = document.querySelectorAll('.fade-section');
+      if (!sections.length) return;
+      if (!('IntersectionObserver' in window)) {
+        sections.forEach(function (s) { s.classList.add('visible'); });
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.12 });
+      sections.forEach(function (s) { io.observe(s); });
     })();
 
     /* ---------- Media: freeze on the 0:03 frame, restart from 0 on click ---------- */
