@@ -3,9 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bilden Enterprises — Custom AI Services</title>
+  <title>Custom AI services for businesses</title>
+  <meta name="description" content="We build custom AI services for the enterprising business — a virtual receptionist, data organization tools, or a multimedia asset." />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="apple-touch-icon" href="favicon.svg" />
+
+  <!-- Social share preview -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Custom AI services for businesses" />
+  <meta property="og:description" content="We build custom AI services for the enterprising business — a virtual receptionist, data organization tools, or a multimedia asset." />
+  <meta property="og:image" content="https://bildenenterprises.com/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:url" content="https://bildenenterprises.com/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Custom AI services for businesses" />
+  <meta name="twitter:description" content="We build custom AI services for the enterprising business." />
+  <meta name="twitter:image" content="https://bildenenterprises.com/og-image.png" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -40,11 +54,11 @@
 
     /* ---------- Header / Logo ---------- */
     header { padding: 26px 0 6px; }
-    .header-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .header-row { display: flex; align-items: center; justify-content: flex-start; gap: 14px; }
     .logo { display: block; text-decoration: none; }
     .wordmark { display: block; width: 130px; }
     .wordmark svg { width: 100%; height: auto; display: block; }
-    .hammer { flex: none; width: 42px; height: 42px; }
+    .hammer { flex: none; width: 30px; height: 30px; display: flex; align-items: center; }
     .hammer svg { width: 100%; height: 100%; display: block; transform: rotate(35deg); }
 
     /* ---------- Hero ---------- */
@@ -230,15 +244,19 @@
       box-shadow: 0 18px 44px rgba(22,40,74,0.25); border: 1px solid var(--navy-line);
       cursor: pointer; background: #000;
     }
-    .video-frame iframe, .video-frame img { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; object-fit: cover; }
-    .video-frame .play {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    .video-frame iframe, .video-frame #ytplayer { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    .video-overlay {
+      position: absolute; inset: 0; z-index: 2; cursor: pointer;
+      display: grid; place-items: center; background: rgba(0,0,0,0.04);
+    }
+    .video-overlay.hidden { display: none; }
+    .video-overlay .play {
       width: 74px; height: 74px; border-radius: 50%; background: rgba(22,40,74,0.82);
       display: grid; place-items: center; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
       transition: transform 0.15s ease, background 0.15s ease;
     }
-    .video-frame:hover .play { transform: translate(-50%,-50%) scale(1.08); background: var(--navy); }
-    .video-frame .play svg { width: 30px; height: 30px; fill: #fff; margin-left: 4px; }
+    .video-overlay:hover .play { transform: scale(1.08); background: var(--navy); }
+    .video-overlay .play svg { width: 30px; height: 30px; fill: #fff; margin-left: 4px; }
     .media-caption { text-align: center; color: var(--navy-soft); margin-top: 16px; font-size: 1.08rem; }
 
     /* ---------- Footer ---------- */
@@ -298,8 +316,7 @@
     <div class="wrap">
       <p>We build <span class="accent">custom AI services</span> for the enterprising business —
          whether you need a virtual receptionist, data organization tools, or a multimedia asset.</p>
-      <p class="callout">Call us at <a href="tel:+15617818103">+1 (561) 781-8103</a> or
-         <a href="#contact">send us an email!</a></p>
+      <p class="callout">Call us at <a href="tel:+15617818103">+1 (561) 781-8103</a></p>
     </div>
   </div>
 
@@ -431,9 +448,11 @@
   <section id="media">
     <div class="wrap">
       <h2 class="section-title">Media</h2>
-      <div class="video-frame" id="videoFrame" role="button" tabindex="0" aria-label="Play the Henry Flagler video">
-        <img src="https://i.ytimg.com/vi/r-2Egfabo84/hqdefault.jpg" alt="Henry Flagler video thumbnail" />
-        <div class="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      <div class="video-frame" id="videoFrame">
+        <div id="ytplayer"></div>
+        <div class="video-overlay" id="videoOverlay" role="button" tabindex="0" aria-label="Play the Henry Flagler video">
+          <div class="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
       </div>
       <p class="media-caption">An informative media campaign — the story of Henry Flagler.</p>
     </div>
@@ -449,7 +468,7 @@
   </footer>
 
   <!-- hidden audio: real recording when present, speech fallback otherwise -->
-  <audio id="callAudio" src="audio.mp3" preload="auto"></audio>
+  <audio id="callAudio" src="audio.mp3" preload="auto" playsinline></audio>
 
   <script>
     /* ---------- Contact form → email ---------- */
@@ -507,6 +526,8 @@
 
       function playGreeting() {
         // Try the real recording first; fall back to synthesized voice.
+        // Reset + play() must stay inside the tap handler so mobile browsers allow it.
+        try { callAudio.currentTime = 0; } catch (e) {}
         var p = callAudio.play();
         if (p && p.catch) { p.catch(function () { speakFallback(); }); }
       }
@@ -520,7 +541,7 @@
         transcript.classList.add('show');
         transcriptText.textContent = LINE;
         playGreeting();
-        setTimeout(function () { panel.classList.add('show'); }, 1400);
+        panel.classList.add('show');
       }
 
       phone.addEventListener('click', answer);
@@ -529,22 +550,62 @@
       });
     })();
 
-    /* ---------- Click-to-play video (loads player on click) ---------- */
+    /* ---------- Insights fade in on scroll (regardless of the call) ---------- */
     (function () {
-      var frame = document.getElementById('videoFrame');
-      function play() {
-        var iframe = document.createElement('iframe');
-        iframe.src = 'https://www.youtube.com/embed/r-2Egfabo84?autoplay=1&playsinline=1';
-        iframe.title = 'Henry Flagler';
-        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
-        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
-        iframe.allowFullscreen = true;
-        frame.innerHTML = '';
-        frame.appendChild(iframe);
+      var panel = document.getElementById('panel');
+      if (!panel) return;
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) { panel.classList.add('show'); io.disconnect(); }
+          });
+        }, { threshold: 0.15 });
+        io.observe(panel);
+      } else {
+        panel.classList.add('show');
       }
-      frame.addEventListener('click', play);
-      frame.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); play(); }
+    })();
+
+    /* ---------- Media: freeze on the 0:03 frame, restart from 0 on click ---------- */
+    (function () {
+      var overlay = document.getElementById('videoOverlay');
+      var player, frozen = false;
+
+      var tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(tag);
+
+      window.onYouTubeIframeAPIReady = function () {
+        player = new YT.Player('ytplayer', {
+          videoId: 'r-2Egfabo84',
+          playerVars: {
+            autoplay: 1, mute: 1, controls: 1, playsinline: 1,
+            rel: 0, modestbranding: 1, start: 3
+          },
+          events: {
+            onStateChange: function (e) {
+              // First time it begins (muted autoplay), pause on the ~0:03 frame.
+              if (!frozen && e.data === YT.PlayerState.PLAYING) {
+                frozen = true;
+                player.pauseVideo();
+              }
+            }
+          }
+        });
+      };
+
+      function start() {
+        overlay.classList.add('hidden');
+        if (player && player.seekTo) {
+          player.seekTo(0, true);   // restart from the beginning
+          player.unMute();
+          player.setVolume(100);
+          player.playVideo();
+        }
+      }
+      overlay.addEventListener('click', start);
+      overlay.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); start(); }
       });
     })();
   </script>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    font-family: "Nunito", system-ui, sans-serif;
+    background: #ffffff; color: #16284a;
+    display: flex; align-items: center; gap: 48px;
+    padding: 56px 64px;
+  }
+  .left { width: 300px; flex: none; }
+  .phone {
+    width: 300px; background: #16284a; border-radius: 42px;
+    padding: 22px 18px 26px; color: #fff;
+    box-shadow: 0 24px 54px rgba(22,40,74,0.3);
+  }
+  .notch { width: 120px; height: 7px; border-radius: 7px; background: rgba(255,255,255,0.35); margin: 2px auto 22px; }
+  .status { text-align: center; opacity: 0.82; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; }
+  .caller { text-align: center; font-size: 26px; font-weight: 800; margin: 4px 0 2px; }
+  .sub { text-align: center; opacity: 0.75; font-size: 14px; }
+  .avatar {
+    width: 84px; height: 84px; border-radius: 50%; margin: 20px auto 18px;
+    background: linear-gradient(135deg,#4f7fd0,#2f4a7c);
+    display: grid; place-items: center; font-size: 34px; font-weight: 900;
+  }
+  .transcript { background: rgba(255,255,255,0.12); border-radius: 16px; padding: 14px 16px; font-size: 16px; line-height: 1.45; }
+  .who { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; font-weight: 700; margin-bottom: 5px; }
+
+  .right { flex: 1; }
+  .wordmark { font-weight: 900; line-height: 0.95; letter-spacing: 1px; }
+  .wordmark .b { font-size: 40px; color: #16284a; display: block; }
+  .wordmark .e { font-size: 27px; color: #2f4a7c; display: block; letter-spacing: 5.5px; }
+  h1 { font-size: 46px; font-weight: 900; line-height: 1.1; margin: 22px 0 26px; letter-spacing: -0.5px; }
+  h1 .accent { color: #3a6fc4; }
+  .stats { display: flex; gap: 14px; }
+  .stat { background: #f3f7fd; border: 1px solid #d9e0ec; border-radius: 16px; padding: 16px 20px; text-align: center; flex: 1; }
+  .num { font-size: 32px; font-weight: 900; color: #16284a; }
+  .lbl { font-size: 12px; font-weight: 700; color: #2f4a7c; text-transform: uppercase; letter-spacing: 0.5px; }
+  .cap { margin-top: 22px; font-size: 17px; font-weight: 700; color: #2f4a7c; }
+</style>
+</head>
+<body>
+  <div class="left">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status">On call</div>
+      <div class="caller">New Patient</div>
+      <div class="sub">Mobile · +1 (561) 020-4221</div>
+      <div class="avatar">S</div>
+      <div class="transcript">
+        <div class="who">Susan · Virtual Receptionist</div>
+        Sure, I'd be happy to help you schedule an appointment!
+      </div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="wordmark"><span class="b">BILDEN</span><span class="e">ENTERPRISES</span></div>
+    <h1>Custom <span class="accent">AI services</span><br/>for businesses</h1>
+    <div class="stats">
+      <div class="stat"><div class="num">142</div><div class="lbl">Calls Answered</div></div>
+      <div class="stat"><div class="num">38</div><div class="lbl">Appts Booked</div></div>
+      <div class="stat"><div class="num">0</div><div class="lbl">Calls Missed</div></div>
+    </div>
+    <div class="cap">A virtual receptionist that never misses a call.</div>
+  </div>
+</body>
+</html>
