@@ -793,16 +793,15 @@
       sections.forEach(function (s) { io.observe(s); });
     })();
 
-    /* ---------- Media: freeze on the 0:03 frame, restart from 0 on click ---------- */
+    /* ---------- Media: lazy-load YouTube only near the section, freeze 0:03, restart on click ---------- */
     (function () {
+      var frame = document.getElementById('videoFrame');
       var overlay = document.getElementById('videoOverlay');
-      var player, frozen = false;
+      if (!frame || !overlay) return;
 
-      var tag = document.createElement('script');
-      tag.src = 'https://www.youtube.com/iframe_api';
-      document.head.appendChild(tag);
+      var player, frozen = false, initialized = false, pendingStart = false;
 
-      window.onYouTubeIframeAPIReady = function () {
+      function createPlayer() {
         player = new YT.Player('ytplayer', {
           videoId: 'r-2Egfabo84',
           playerVars: {
@@ -810,6 +809,7 @@
             rel: 0, modestbranding: 1, start: 3
           },
           events: {
+            onReady: function () { if (pendingStart) realStart(); },
             onStateChange: function (e) {
               // First time it begins (muted autoplay), pause on the ~0:03 frame.
               if (!frozen && e.data === YT.PlayerState.PLAYING) {
@@ -819,17 +819,51 @@
             }
           }
         });
-      };
+      }
+
+      function initPlayer() {
+        if (initialized) return;
+        initialized = true;
+        if (window.YT && window.YT.Player) {
+          createPlayer();
+        } else {
+          window.onYouTubeIframeAPIReady = createPlayer;
+          var tag = document.createElement('script');
+          tag.src = 'https://www.youtube.com/iframe_api';
+          document.head.appendChild(tag);
+        }
+      }
+
+      function realStart() {
+        player.seekTo(0, true);   // restart from the beginning
+        player.unMute();
+        player.setVolume(100);
+        player.playVideo();
+      }
 
       function start() {
         overlay.classList.add('hidden');
-        if (player && player.seekTo) {
-          player.seekTo(0, true);   // restart from the beginning
-          player.unMute();
-          player.setVolume(100);
-          player.playVideo();
+        if (player && player.playVideo) {
+          realStart();
+        } else {
+          pendingStart = true;    // play as soon as the lazily-loaded player is ready
+          initPlayer();
         }
       }
+
+      // Defer all YouTube work until the section approaches the viewport,
+      // so it never blocks the first paint / initial scroll.
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) { initPlayer(); io.disconnect(); }
+          });
+        }, { rootMargin: '400px' });
+        io.observe(frame);
+      } else {
+        initPlayer();
+      }
+
       overlay.addEventListener('click', start);
       overlay.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); start(); }
