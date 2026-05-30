@@ -141,16 +141,30 @@
       align-items: center;
       gap: 0.32em;
       width: 100%;
-      min-height: 1.35em;
+      height: 1.5em;             /* fixed height: no layout shift while scrolling */
       margin: 0.1em 0;
+      /* never intercept touches — keeps the page easy to scroll over the animation */
+      pointer-events: none;
+      -webkit-user-select: none; user-select: none;
     }
-    .hero .cycle {
+    .cycle {
       color: var(--blue-accent); font-weight: 800;
       opacity: 1; transform: translateY(0);
       transition: opacity 0.5s ease, transform 0.5s ease;
-      will-change: opacity, transform;
+      pointer-events: none; -webkit-user-select: none; user-select: none;
     }
     .tagline-rest { display: block; }
+
+    /* "We help you with …" cycling line under the contact details */
+    .hero .helps {
+      margin: 18px 0 0;
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
+      font-weight: 700;
+      color: var(--navy-soft);
+      opacity: 0;
+      animation: fadeUp 1.1s ease forwards 0.7s;
+    }
+    .cycle-alt { display: inline-block; min-width: 1px; }
     .hero .callout {
       margin: 22px 0 0;
       font-size: clamp(1.05rem, 2vw, 1.25rem);
@@ -341,6 +355,55 @@
     .video-overlay .play svg { width: 30px; height: 30px; fill: #fff; margin-left: 4px; }
     .media-caption { text-align: center; color: var(--navy-soft); margin-top: 16px; font-size: 1.08rem; }
 
+    /* ---------- HIPAA badge in the phone demo ---------- */
+    .hipaa {
+      display: inline-block; margin-left: 6px;
+      color: #1ee36b; font-weight: 900; letter-spacing: 0.5px;
+      text-shadow: 0 0 10px rgba(30,227,107,0.55);
+    }
+    .hipaa::before { content: "● "; font-size: 0.7em; vertical-align: 1px; }
+    .phone .receptionist-tag {
+      text-align: center; margin-top: 6px; font-size: 0.9rem; font-weight: 700;
+    }
+    .phone .receptionist-tag .role { opacity: 0.85; }
+
+    /* ---------- Booking calendar mock ---------- */
+    .cal-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 6px; }
+    .cal-head .mon { font-weight: 800; font-size: 1.1rem; }
+    .cal-head .new { color: #15a35a; font-weight: 800; font-size: 0.95rem; }
+    .cal-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    .cal-col { background: var(--white); border: 1px solid var(--navy-line); border-radius: 14px; padding: 10px 8px; min-height: 150px; }
+    .cal-col .day { text-align: center; font-weight: 800; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--navy-soft); margin-bottom: 8px; }
+    .cal-col .date { display: block; font-size: 1.15rem; color: var(--navy); }
+    .booking {
+      background: var(--bg-tint); border-left: 4px solid var(--blue-accent);
+      border-radius: 8px; padding: 6px 8px; margin-bottom: 7px; font-size: 0.78rem; line-height: 1.25;
+    }
+    .booking.fresh { border-left-color: #15a35a; background: #e8f8ee; }
+    .booking .t { font-weight: 800; display: block; }
+    .booking .who { color: var(--navy-soft); }
+    .booking .tag { display: inline-block; margin-top: 2px; font-size: 0.66rem; font-weight: 800; color: #15a35a; text-transform: uppercase; letter-spacing: 0.5px; }
+    @media (max-width: 600px) {
+      .cal-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ---------- Bouncing media sub-headers ---------- */
+    .media-more { display: flex; flex-wrap: wrap; gap: 14px 34px; justify-content: center; margin-top: 30px; }
+    .media-more .bouncer {
+      font-size: clamp(1.15rem, 2.6vw, 1.6rem); font-weight: 900; color: var(--navy);
+      display: inline-block; animation: bounce 1.6s ease-in-out infinite;
+    }
+    .media-more .bouncer:nth-child(2) { animation-delay: 0.2s; color: var(--blue-accent); }
+    .media-more .bouncer:nth-child(3) { animation-delay: 0.4s; color: var(--navy-soft); }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      30%      { transform: translateY(-10px); }
+      50%      { transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .media-more .bouncer { animation: none; }
+    }
+
     /* ---------- Footer ---------- */
     footer { border-top: 2px solid var(--navy-line); padding: 32px 0 54px; color: var(--navy-soft); font-size: 1rem; }
     footer .wrap { text-align: center; }
@@ -391,42 +454,23 @@
   <!-- ===== Hero ===== -->
   <div class="hero">
     <div class="wrap">
-      <p>Custom built <span class="accent">AI services</span> that help
+      <p>Custom built <span class="accent">AI solutions</span> that help
          <span class="cycle-line">
            <span class="hammer-inline" id="cycleHammer" aria-hidden="true"><svg viewBox="0 0 16 16" fill="#3a6fc4"><path d="M9.972 2.508a.5.5 0 0 0-.16-.556l-.178-.129a5 5 0 0 0-2.076-.783C6.215.862 4.504 1.229 2.84 3.133H1.786a.5.5 0 0 0-.354.147L.146 4.567a.5.5 0 0 0 0 .706l2.571 2.579a.5.5 0 0 0 .708 0l1.286-1.29a.5.5 0 0 0 .146-.353V5.57l8.387 8.873A.5.5 0 0 0 14 14.5l1.5-1.5a.5.5 0 0 0 .017-.689l-9.129-8.63c.747-.456 1.772-.839 3.112-.839a.5.5 0 0 0 .472-.334z"/></svg></span>
-           <span class="cycle" id="cycleWord">investors</span>
+           <span class="cycle" id="cycleWord">entrepreneurs</span>
          </span>
-         <span class="tagline-rest">automate excellence so they can perform — and relax!</span></p>
-      <p class="callout">Call us at <a href="tel:+15617818103">+1 (561) 781-8103</a></p>
+         <span class="tagline-rest">perform better — and relax!</span></p>
+      <p class="callout">Call us at <a href="tel:+15617818103">+1 (561) 781-8103</a><br />
+         Email us at <a href="mailto:bildenenterprises@gmail.com">bildenenterprises@gmail.com</a></p>
+
+      <p class="helps">We help you with <span class="cycle cycle-alt" id="helpWord">websites</span></p>
     </div>
   </div>
 
-  <!-- ===== Contact ===== -->
-  <section id="contact" class="fade-section">
-    <div class="wrap">
-      <div class="card">
-        <h2>Send us an email</h2>
-        <p class="hint">Tell us what you'd like to build. Your note goes straight to our team.</p>
-        <form id="contactForm">
-          <label for="name">Your name</label>
-          <input type="text" id="name" name="name" placeholder="Jane Doe" required />
-
-          <label for="email">Your email</label>
-          <input type="email" id="email" name="email" placeholder="jane@example.com" required />
-
-          <label for="message">Your message</label>
-          <textarea id="message" name="message" placeholder="I'd like a virtual receptionist for my clinic..." required></textarea>
-
-          <button type="submit" class="btn">✉&nbsp; Send Email</button>
-        </form>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== Virtual Assistant ===== -->
+  <!-- ===== Virtual Receptionist ===== -->
   <section id="demo" class="fade-section">
     <div class="wrap">
-      <h2 class="section-title">Virtual Assistant</h2>
+      <h2 class="section-title">Virtual Receptionist</h2>
       <div class="demo-grid">
 
         <!-- Phone -->
@@ -435,6 +479,7 @@
           <div class="status" id="phoneStatus">Incoming call</div>
           <div class="caller">New Patient</div>
           <div class="sub">Mobile · +1 (561) 020-4221</div>
+          <div class="receptionist-tag"><span class="role">Virtual Receptionist</span> <span class="hipaa">HIPAA Compliant</span></div>
 
           <div class="avatar ringing" id="avatar">S</div>
 
@@ -456,6 +501,7 @@
 
           <div class="tabs" role="tablist">
             <button class="tab active" data-tab="insights" role="tab">Call Insights</button>
+            <button class="tab" data-tab="calendar" role="tab">New Bookings</button>
             <button class="tab" data-tab="email" role="tab">See Weekly Email Summaries</button>
           </div>
 
@@ -477,6 +523,45 @@
                 <tr><td>Other</td><td>11</td><td>8%</td></tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Tab: New Bookings (calendar mock) -->
+          <div class="tab-panel" id="tab-calendar" role="tabpanel">
+            <div class="cal-head">
+              <span class="mon">May 26 – May 30, 2026</span>
+              <span class="new">+12 new bookings this week</span>
+            </div>
+            <div class="cal-grid">
+              <div class="cal-col">
+                <div class="day">Mon <span class="date">26</span></div>
+                <div class="booking fresh"><span class="t">9:00 AM</span><span class="who">Maria G. — Cleaning</span><span class="tag">New</span></div>
+                <div class="booking"><span class="t">11:30 AM</span><span class="who">J. Alvarez — Follow-up</span></div>
+                <div class="booking fresh"><span class="t">2:15 PM</span><span class="who">New Patient — Exam</span><span class="tag">New</span></div>
+              </div>
+              <div class="cal-col">
+                <div class="day">Tue <span class="date">27</span></div>
+                <div class="booking"><span class="t">8:30 AM</span><span class="who">R. Patel — Filling</span></div>
+                <div class="booking fresh"><span class="t">10:00 AM</span><span class="who">New Patient — Cleaning</span><span class="tag">New</span></div>
+                <div class="booking fresh"><span class="t">3:45 PM</span><span class="who">Dana W. — Consult</span><span class="tag">New</span></div>
+              </div>
+              <div class="cal-col">
+                <div class="day">Wed <span class="date">28</span></div>
+                <div class="booking fresh"><span class="t">9:15 AM</span><span class="who">New Patient — Exam</span><span class="tag">New</span></div>
+                <div class="booking"><span class="t">1:00 PM</span><span class="who">T. Nguyen — Whitening</span></div>
+              </div>
+              <div class="cal-col">
+                <div class="day">Thu <span class="date">29</span></div>
+                <div class="booking fresh"><span class="t">8:00 AM</span><span class="who">New Patient — Cleaning</span><span class="tag">New</span></div>
+                <div class="booking fresh"><span class="t">11:00 AM</span><span class="who">L. Brooks — Exam</span><span class="tag">New</span></div>
+                <div class="booking"><span class="t">4:30 PM</span><span class="who">S. Cohen — Follow-up</span></div>
+              </div>
+              <div class="cal-col">
+                <div class="day">Fri <span class="date">30</span></div>
+                <div class="booking fresh"><span class="t">9:30 AM</span><span class="who">New Patient — Exam</span><span class="tag">New</span></div>
+                <div class="booking fresh"><span class="t">12:15 PM</span><span class="who">New Patient — Cleaning</span><span class="tag">New</span></div>
+                <div class="booking fresh"><span class="t">3:00 PM</span><span class="who">After-hours booking</span><span class="tag">New</span></div>
+              </div>
+            </div>
           </div>
 
           <!-- Tab: Weekly Email Summary (Gmail mock) -->
@@ -536,6 +621,12 @@
         </div>
       </div>
       <p class="media-caption">An informative media campaign — the story of Henry Flagler.</p>
+
+      <div class="media-more" aria-label="More media services">
+        <span class="bouncer">Office Jingles</span>
+        <span class="bouncer">Video Memory Books</span>
+        <span class="bouncer">Advertisements</span>
+      </div>
     </div>
   </section>
 
@@ -555,22 +646,6 @@
   </audio>
 
   <script>
-    /* ---------- Contact form → email ---------- */
-    document.getElementById('contactForm').addEventListener('submit', function (e) {
-      e.preventDefault();
-      var name = document.getElementById('name').value.trim();
-      var email = document.getElementById('email').value.trim();
-      var message = document.getElementById('message').value.trim();
-
-      var subject = 'Website inquiry from ' + (name || 'a visitor');
-      var body = 'Name: ' + name + '\n' + 'Email: ' + email + '\n\n' + message;
-
-      window.location.href =
-        'mailto:bildenenterprises@gmail.com' +
-        '?subject=' + encodeURIComponent(subject) +
-        '&body=' + encodeURIComponent(body);
-    });
-
     /* ---------- Tabs ---------- */
     document.querySelectorAll('.tab').forEach(function (tab) {
       tab.addEventListener('click', function () {
@@ -657,7 +732,7 @@
       var hammer = document.getElementById('cycleHammer');
       if (!el) return;
       var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      var words = ['investors', 'real estate firms', 'families', 'entrepreneurs', 'enterprising teams'];
+      var words = ['entrepreneurs', 'real estate firms', 'investors', 'families', 'teams'];
       var i = 0;
 
       function tick() {
@@ -682,6 +757,24 @@
       }
 
       setInterval(tick, 3000);
+    })();
+
+    /* ---------- "We help you with …" simple fade cycler ---------- */
+    (function () {
+      var el = document.getElementById('helpWord');
+      if (!el) return;
+      var words = ['websites', 'CRM', 'texts and calls', 'advertisements', 'dashboards', 'media', 'email updates'];
+      var i = 0;
+      setInterval(function () {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(6px)';
+        setTimeout(function () {
+          i = (i + 1) % words.length;
+          el.textContent = words[i];
+          el.style.opacity = '1';
+          el.style.transform = 'translateY(0)';
+        }, 400);
+      }, 2400);
     })();
 
     /* ---------- Every section fades in on scroll ---------- */
